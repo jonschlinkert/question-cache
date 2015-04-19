@@ -7,6 +7,19 @@
 
 'use strict';
 
+/**
+ * Create an instance of `Questions` with the
+ * given `options`.
+ *
+ * ```js
+ * var inquirer = require('inquirer')
+ * var questions = new Questions({inquirer: inquirer});
+ * ```
+ *
+ * @param {Object} `options` Pass your instance of [inquirer] on the `inquirer` option.
+ * @api public
+ */
+
 function Questions(options) {
   this.options = options || {};
   this.inquirer = this.options.inquirer;

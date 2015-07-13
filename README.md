@@ -38,7 +38,7 @@ var inquirer = require('inquirer')
 var questions = new Questions({inquirer: inquirer});
 ```
 
-### [.set](index.js#L45)
+### [.set](index.js#L47)
 
 Store a question object by `key`.
 
@@ -57,7 +57,7 @@ questions.set('name', {
 });
 ```
 
-### [.get](index.js#L64)
+### [.get](index.js#L67)
 
 Get a question by `key`.
 
@@ -73,7 +73,7 @@ questions.get('name');
 //=> {type: 'input', message: 'What is your name?', default: ''}
 ```
 
-### [.ask](index.js#L81)
+### [.ask](index.js#L84)
 
 Ask a question or array of questions.
 
@@ -89,29 +89,69 @@ questions.ask(['name', 'homepage']);
 //=> { name: 'foo', homepage: 'https://github/foo' }
 ```
 
+### [.prompt](index.js#L125)
+
+Exposes the `prompt` method on [inquirer](undefined)as a convenience.
+
+**Params**
+
+* `question` **{Object|Array}**: Question object or array of question objects.
+* `callback` **{Object}**: Callback function.
+
+**Example**
+
+```js
+questions.prompt({
+  type: 'list',
+  name: 'chocolate',
+  message: 'What\'s your favorite chocolate?',
+  choices: ['Mars', 'Oh Henry', 'Hershey']
+}, function(answers) {
+  //=> {chocolate: 'Hershey'}
+});
+```
+
 ## Example
 
 ```js
 var Questions = require('question-cache');
-var questions = new Questions({
-  inquirer: require('inquirer')
-});
+var inquirer = require('inquirer');
+var questions = new Questions({inquirer: inquirer});
 
-questions.set('first', {
-  type: 'input',
-  message: 'What is your first name?',
-  default: ''
-});
+questions
+  .set('first', {
+    type: 'input',
+    message: 'What is your first name?',
+    default: ''
+  })
+  .set('last', {
+    type: 'input',
+    message: 'What is your last name?',
+    default: ''
+  })
+  .ask(function (err, answers) {
+    console.log(answers);
+    //=> { first: 'Jon', last: 'Schlinkert' }
+  });
 
-questions.set('last', {
-  type: 'input',
-  message: 'What is your last name?',
-  default: ''
-});
+/**
+ * Nested questions
+ */
 
-questions.ask(['first', 'last'], function (err, answers) {
-  console.log(answers);
-  //=> { first: 'Jon', last: 'Schlinkert' }
+questions.prompt({
+  type: 'list',
+  name: 'chocolate',
+  message: 'What\'s your favorite chocolate?',
+  choices: ['Mars', 'Oh Henry', 'Hershey']
+}, function (answers) {
+  questions.prompt({
+    type: 'list',
+    name: 'beverage',
+    message: 'And your favorite beverage?',
+    choices: ['Pepsi', 'Coke', '7up', 'Mountain Dew', 'Red Bull']
+  }, function (answers) {
+    console.log(answers);
+  });
 });
 ```
 

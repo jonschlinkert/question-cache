@@ -43,6 +43,7 @@ function Questions(options) {
  */
 
 Questions.prototype.set = function(key, value) {
+  value.name = value.name || key;
   this.cache[key] = value;
   return this;
 };
@@ -79,14 +80,11 @@ Questions.prototype.get = function(key) {
 
 Questions.prototype.ask = function(keys, cb) {
   keys = Array.isArray(keys) ? keys : [keys];
-  var len = keys.length, i = 0;
+  var len = keys.length, i = -1;
   var questions = [];
 
-  while (len--) {
-    var key = keys[i++];
-    var question = this.cache[key];
-    question.name = key;
-    questions.push(question);
+  while (++i < len) {
+    questions.push(this.cache[keys[i]]);
   }
 
   this.inquirer.prompt(questions, function(answers) {

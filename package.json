@@ -1,7 +1,7 @@
 {
   "name": "question-cache",
   "description": "A tiny wrapper around inquirer that makes it easy to create and selectively reuse questions. Useful for project generators like yeoman or generate.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/jonschlinkert/question-cache",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/question-cache",
@@ -40,5 +40,6 @@
   },
   "devDependencies": {
     "inquirer": "^0.8.5"
-  }
+  },
+  "dependencies": {}
 }

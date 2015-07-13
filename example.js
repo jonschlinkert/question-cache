@@ -1,21 +1,22 @@
 
 var Questions = require('./');
-var inquirer = require('inquirer');
-var questions = new Questions({inquirer: inquirer});
+var questions = new Questions({
+  inquirer: require('inquirer')
+});
 
-questions.set('name', {
+questions.set('first', {
   type: 'input',
-  message: 'What is your name?',
+  message: 'What is your first name?',
   default: ''
 });
 
-questions.set('repo', {
+questions.set('last', {
   type: 'input',
-  message: 'What is the repo URL?',
+  message: 'What is your last name?',
   default: ''
 });
 
-questions.ask(['name', 'repo'], function (err, answers) {
+questions.ask(['first', 'last'], function (err, answers) {
   console.log(answers);
-  //=> { repo: 'foo', name: 'bar' }
+  //=> { first: 'Jon', last: 'Schlinkert' }
 });

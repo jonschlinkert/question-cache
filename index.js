@@ -89,7 +89,7 @@ Questions.prototype.ask = function(keys, cb) {
     keys = Array.isArray(keys) ? keys : [keys];
     var len = keys.length, i = -1;
     while (++i < len) {
-      questions.push(this.get[keys[i]]);
+      questions.push(this.get(keys[i]));
     }
   }
 

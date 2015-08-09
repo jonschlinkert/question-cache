@@ -1,7 +1,7 @@
 {
   "name": "question-cache",
-  "description": "A tiny wrapper around inquirer that makes it easy to create and selectively reuse questions. Useful for project generators like yeoman or generate.",
-  "version": "0.1.2",
+  "description": "A wrapper around inquirer that makes it easy to create and selectively reuse questions.",
+  "version": "0.2.0",
   "homepage": "https://github.com/jonschlinkert/question-cache",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/question-cache",
@@ -29,17 +29,23 @@
     "util",
     "yeoman"
   ],
+  "devDependencies": {
+    "ansi-green": "^0.1.1",
+    "ansi-red": "^0.1.1",
+    "inquirer": "^0.8.5"
+  },
+  "dependencies": {
+    "get-value": "^1.1.5",
+    "has-value": "^0.2.0",
+    "set-value": "^0.2.0"
+  },
   "verb": {
     "related": {
       "list": [
+        "question-helper",
         "generate",
-        "option-cache",
-        "verb"
+        "ask-once"
       ]
     }
-  },
-  "devDependencies": {
-    "inquirer": "^0.8.5"
-  },
-  "dependencies": {}
+  }
 }

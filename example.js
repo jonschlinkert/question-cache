@@ -7,5 +7,5 @@ questions
   .set('last', 'What is your last name?')
   .ask(function (err, answers) {
     console.log(answers);
-    //=> { first: 'Brian', last: 'Woodward' }
+    //=> { first: 'Jon', last: 'Schlinkert' }
   });

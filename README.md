@@ -14,7 +14,7 @@ questions
   .set('last', 'What is your last name?')
   .ask(function (err, answers) {
     console.log(answers);
-    //=> { first: 'Brian', last: 'Woodward' }
+    //=> { first: 'Jon', last: 'Schlinkert' }
   });
 ```
 
@@ -206,7 +206,7 @@ questions.ask(['name', 'homepage']);
 //=> { name: 'foo', homepage: 'https://github/foo' }
 ```
 
-### [.prompt](index.js#L218)
+### [.prompt](index.js#L222)
 
 Exposes the `prompt` method on [inquirer](https://github.com/sboudrias/Inquirer.js#readme)as a convenience.
 

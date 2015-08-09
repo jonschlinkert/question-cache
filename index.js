@@ -7,6 +7,10 @@
 
 'use strict';
 
+var get = require('get-value');
+var has = require('has-value');
+var set = require('set-value');
+
 /**
  * Create an instance of `Questions` with the
  * given `options`.
@@ -22,7 +26,8 @@
 
 function Questions(options) {
   this.options = options || {};
-  this.inquirer = this.options.inquirer;
+  define(this, 'inquirer', this.options.inquirer);
+  delete this.options.inquirer;
   this.cache = {};
   this.queue = [];
 }
@@ -44,8 +49,16 @@ function Questions(options) {
  */
 
 Questions.prototype.set = function(key, value) {
+  if (typeof value === 'undefined') {
+    value = key;
+    key = this.queue.length;
+  }
+  if (typeof value === 'string') {
+    value = {message: value};
+  }
+  value.type = value.type || 'input';
   value.name = value.name || key;
-  this.cache[key] = value;
+  set(this.cache, key, value);
   this.queue.push(value);
   return this;
 };
@@ -64,7 +77,86 @@ Questions.prototype.set = function(key, value) {
  */
 
 Questions.prototype.get = function(key) {
-  return this.cache[key];
+  return get(this.cache, key);
+};
+
+/**
+ * Return true if the given question name is stored on
+ * question-cache.
+ *
+ * ```js
+ * var exists = questions.has('name');
+ * //=> true or false
+ * ```
+ *
+ * @param {String} `key` Unique question id.
+ * @param {Object} `value` Question object that follows [inquirer] conventions.
+ * @api public
+ */
+
+Questions.prototype.has = function(key) {
+  return has(this.cache, key);
+};
+
+/**
+ * Returns an array of question objects from an array of keys. Keys
+ * may use dot notation.
+ *
+ * @param  {Array} `keys` Question names or object paths.
+ * @return {Array} Array of question objects.
+ * @api public
+ */
+
+Questions.prototype.resolve = function(keys) {
+  return arrayify(keys).reduce(function (acc, key) {
+    var question = {};
+    if (isObject(key)) {
+      question = key;
+    } else {
+      question = this.get(key);
+      if (!question && typeof key === 'string') {
+        question = this.toQuestion(key);
+      }
+    }
+
+    if (!has(question, 'type')) {
+      for (var prop in question) {
+        this.set(prop, question[prop]);
+        var val = this.get(prop);
+
+        if (question.hasOwnProperty(prop)) {
+          acc.push(val);
+        }
+      }
+    } else {
+      acc.push(question);
+    }
+    return acc;
+  }.bind(this), []);
+};
+
+/**
+ * Create a question object from a string. Uses the `input` question type,
+ * and does the following basic normalization:
+ *
+ *   - when `foo` is passed, a `?` is added to the question. e.g. `foo?`
+ *   - when `foo?` is passed, `?` is removed on the question key, so the answer to `foo?` is
+ *   `{foo: 'bar'}`
+ *
+ * @param  {String} `key`
+ * @return {Object} Returns a question object.
+ * @api public
+ */
+
+Questions.prototype.toQuestion = function(key) {
+  var msg = key;
+  if (msg.slice(-1) !== '?') {
+    msg += '?';
+  } else {
+    key = key.slice(0, key.length - 1);
+  }
+  this.set(key, {message: msg});
+  return this.get(key);
 };
 
 /**
@@ -81,21 +173,23 @@ Questions.prototype.get = function(key) {
  */
 
 Questions.prototype.ask = function(keys, cb) {
+  if (isObject(keys)) keys = [keys];
+
   var questions = [];
   if (typeof keys === 'function') {
     cb = keys;
     questions = this.queue;
   } else {
-    keys = Array.isArray(keys) ? keys : [keys];
-    var len = keys.length, i = -1;
-    while (++i < len) {
-      questions.push(this.get[keys[i]]);
-    }
+    questions = this.resolve(keys);
+  }
+
+  if (questions.length === 0) {
+    return cb(new Error('no questions found.'));
   }
 
   try {
     this.prompt(questions, function(answers) {
-      cb(null, answers);
+      cb(null, setEach({}, answers));
     });
   } catch(err) {
     cb(err);
@@ -124,6 +218,53 @@ Questions.prototype.ask = function(keys, cb) {
 Questions.prototype.prompt = function() {
   return this.inquirer.prompt.apply(this.inquirer, arguments);
 };
+
+/**
+ * Utility for setting values on properties defined using
+ * dot notation (object paths).
+ *
+ * @param {object} `obj` Object to store values on.
+ * @param {object} `answers` Answers object.
+ */
+
+function setEach(obj, answers) {
+  for (var key in answers) {
+    if (answers.hasOwnProperty(key)) {
+      set(obj, key, answers[key]);
+    }
+  }
+  return obj;
+}
+
+/**
+ * Utility for casting a value to an array.
+ */
+
+function arrayify(val) {
+  return Array.isArray(val) ? val : [val];
+}
+
+/**
+ * Utility for casting a value to an array.
+ */
+
+function isObject(val) {
+  return val && typeof val === 'object'
+    && !Array.isArray(val);
+}
+
+/**
+ * Utility for definining a non-enumerable property.
+ */
+
+function define(obj, prop, val) {
+  Object.defineProperty(obj, prop, {
+    configurable: true,
+    enumerable: false,
+    writable: true,
+    value: val
+  });
+}
 
 /**
  * Expose `Questions`

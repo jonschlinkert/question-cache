@@ -180,13 +180,9 @@ Questions.prototype.ask = function(keys, cb) {
     cb = keys;
     questions = this.queue;
   } else {
-    keys = Array.isArray(keys) ? keys : [keys];
-    var len = keys.length, i = -1;
-    while (++i < len) {
-      questions.push(this.get(keys[i]));
-    }
+    questions = this.resolve(keys);
   }
-  
+
   if (questions.length === 0) {
     return cb(new Error('no questions found.'));
   }

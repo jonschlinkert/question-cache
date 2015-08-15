@@ -51,7 +51,7 @@ function Questions(options) {
 Questions.prototype.set = function(key, value) {
   if (typeof value === 'undefined') {
     value = key;
-    key = this.queue.length;
+    key = 'key_' + this.queue.length;
   }
   if (typeof value === 'string') {
     value = {message: value};

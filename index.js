@@ -7,9 +7,10 @@
 
 'use strict';
 
-var get = require('get-value');
-var has = require('has-value');
-var set = require('set-value');
+var lazy = require('lazy-cache')(require);
+lazy('get-value', 'get');
+lazy('has-value', 'has');
+lazy('set-value', 'set');
 
 /**
  * Create an instance of `Questions` with the
@@ -58,7 +59,7 @@ Questions.prototype.set = function(key, value) {
   }
   value.type = value.type || 'input';
   value.name = value.name || key;
-  set(this.cache, key, value);
+  lazy.set(this.cache, key, value);
   this.queue.push(value);
   return this;
 };
@@ -77,7 +78,7 @@ Questions.prototype.set = function(key, value) {
  */
 
 Questions.prototype.get = function(key) {
-  return get(this.cache, key);
+  return lazy.get(this.cache, key);
 };
 
 /**
@@ -95,7 +96,7 @@ Questions.prototype.get = function(key) {
  */
 
 Questions.prototype.has = function(key) {
-  return has(this.cache, key);
+  return lazy.has(this.cache, key);
 };
 
 /**
@@ -119,7 +120,7 @@ Questions.prototype.resolve = function(keys) {
       }
     }
 
-    if (!has(question, 'type')) {
+    if (!lazy.has(question, 'type')) {
       for (var prop in question) {
         this.set(prop, question[prop]);
         var val = this.get(prop);
@@ -230,7 +231,7 @@ Questions.prototype.prompt = function() {
 function setEach(obj, answers) {
   for (var key in answers) {
     if (answers.hasOwnProperty(key)) {
-      set(obj, key, answers[key]);
+      lazy.set(obj, key, answers[key]);
     }
   }
   return obj;

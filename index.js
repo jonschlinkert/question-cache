@@ -26,6 +26,9 @@ lazy('set-value', 'set');
  */
 
 function Questions(options) {
+  if (!(this instanceof Questions)) {
+    return new Questions(options);
+  }
   this.options = options || {};
   define(this, 'inquirer', this.options.inquirer);
   delete this.options.inquirer;

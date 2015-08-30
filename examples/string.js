@@ -1,7 +1,6 @@
-var Questions = require('..');
-var inquirer = require('inquirer');
-var questions = new Questions({inquirer: inquirer});
+var questions = require('..')();
 
-questions.ask('name', function (err, answers) {
-  console.log(answers);
-});
+questions
+  .ask('name', function (err, answers) {
+    console.log(answers);
+  });

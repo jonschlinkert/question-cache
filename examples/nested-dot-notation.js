@@ -1,6 +1,4 @@
-var Questions = require('..');
-var inquirer = require('inquirer');
-var questions = new Questions({inquirer: inquirer});
+var questions = require('..')();
 
 questions
   .set('name.first', {
@@ -14,11 +12,11 @@ questions
 
 
 questions.ask('name.first', function (err, answers) {
-  console.log(answers);
+  // console.log(answers);
   //=> {name: { first: 'Brian' }}
 
   questions.ask('name.last', function (err, answers) {
-    console.log(answers);
+    // console.log(answers);
     //=> {name: { last: 'Woodward' }}
   });
 });

@@ -1,8 +1,6 @@
 var red = require('ansi-red');
 var green = require('ansi-green');
-var Questions = require('..');
-var inquirer = require('inquirer');
-var questions = new Questions({inquirer: inquirer});
+var questions = require('..')();
 
 /**
  * Nested questions

@@ -1,11 +1,9 @@
-var Questions = require('./');
-var inquirer = require('inquirer');
-var questions = new Questions({inquirer: inquirer});
+var questions = require('./');
 
-questions
+questions()
   .set('first', 'What is your first name?')
   .set('last', 'What is your last name?')
   .ask(function (err, answers) {
     console.log(answers);
-    //=> { first: 'Jon', last: 'Schlinkert' }
   });
+

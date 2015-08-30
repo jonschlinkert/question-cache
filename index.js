@@ -7,7 +7,10 @@
 
 'use strict';
 
+var typeOf = require('kind-of');
 var lazy = require('lazy-cache')(require);
+lazy('inquirer');
+lazy('mixin-deep', 'merge');
 lazy('get-value', 'get');
 lazy('has-value', 'has');
 lazy('set-value', 'set');
@@ -29,8 +32,17 @@ function Questions(options) {
   if (!(this instanceof Questions)) {
     return new Questions(options);
   }
+  if (isObject(options) && 'prompt' in options) {
+    options = {inquirer: options};
+  }
+
   this.options = options || {};
-  define(this, 'inquirer', this.options.inquirer);
+  var inquirer = this.options.inquirer;
+  if (typeof inquirer === 'undefined') {
+    inquirer = lazy.inquirer;
+  }
+
+  define(this, 'inquirer', inquirer);
   delete this.options.inquirer;
   this.cache = {};
   this.queue = [];
@@ -53,15 +65,29 @@ function Questions(options) {
  */
 
 Questions.prototype.set = function(key, value) {
-  if (typeof value === 'undefined') {
-    value = key;
-    key = 'key_' + this.queue.length;
+  if (typeof key === 'undefined') {
+    throw new TypeError('expected set to be a string or object.');
   }
+
+  if (typeof key === 'object') {
+    value = key;
+    key = value.name;
+  }
+
   if (typeof value === 'string') {
     value = {message: value};
+  } else if (typeof key === 'string' && !value) {
+    value = {message: addQmark(key)};
   }
+
+  value = value || {};
+  if (isObject(key)) {
+    value = lazy.merge({}, value, key);
+  }
+
   value.type = value.type || 'input';
-  value.name = value.name || key;
+  value.name = value.name || value.key || key;
+
   lazy.set(this.cache, key, value);
   this.queue.push(value);
   return this;
@@ -112,31 +138,71 @@ Questions.prototype.has = function(key) {
  */
 
 Questions.prototype.resolve = function(keys) {
-  return arrayify(keys).reduce(function (acc, key) {
+  keys = arrayify(keys);
+  var len = keys.length, i = -1;
+  var questions = [];
+
+  while (++i < len) {
     var question = {};
-    if (isObject(key)) {
-      question = key;
-    } else {
+    var key = keys[i];
+
+    if (typeof key === 'string') {
       question = this.get(key);
-      if (!question && typeof key === 'string') {
-        question = this.toQuestion(key);
-      }
+    } else if (isObject(key)) {
+      question = this.normalizeObject(key);
     }
 
-    if (!lazy.has(question, 'type')) {
-      for (var prop in question) {
-        this.set(prop, question[prop]);
-        var val = this.get(prop);
-
-        if (question.hasOwnProperty(prop)) {
-          acc.push(val);
-        }
-      }
-    } else {
-      acc.push(question);
+    if (!question) {
+      question = this.toQuestion(key);
     }
-    return acc;
-  }.bind(this), []);
+
+    if (question.hasOwnProperty('type')) {
+      questions.push(question);
+      continue;
+    }
+
+    for (var prop in question) {
+      this.set(prop, question[prop]);
+      var val = this.get(prop);
+
+      if (question.hasOwnProperty(prop)) {
+        questions.push(val);
+      }
+    }
+  }
+  return questions;
+};
+
+/**
+ * Normalize questions into a consistent object format
+ * following [inquirer][] conventions.
+ *
+ * @param {Object} `questions`
+ * @param {Object} `options`
+ * @return {Object}
+ */
+
+Questions.prototype.normalizeObject = function(questions) {
+  var opts = this.options;
+  var res = [];
+
+  for (var key in questions) {
+    if (questions.hasOwnProperty(key)) {
+      var val = questions[key];
+      var question;
+
+      if (typeof val === 'string') {
+        question = this.toQuestion(key, val, opts);
+
+      } else if (typeof val === 'object') {
+        var opts = lazy.merge({}, opts, val);
+        question = this.toQuestion(key, null, opts);
+      }
+
+      if (question) res = res.concat(question);
+    }
+  }
+  return res;
 };
 
 /**
@@ -152,15 +218,26 @@ Questions.prototype.resolve = function(keys) {
  * @api public
  */
 
-Questions.prototype.toQuestion = function(key) {
-  var msg = key;
-  if (msg.slice(-1) !== '?') {
-    msg += '?';
-  } else {
-    key = key.slice(0, key.length - 1);
+Questions.prototype.toQuestion = function(key, value) {
+  var obj = {};
+  if (isReserved(key) && typeof value === 'string') {
+    obj[key] = value;
+
+  } else if (typeof key === 'string') {
+    obj.name = key;
+
+  } else if (typeof value === 'string') {
+    obj.message = value;
   }
-  this.set(key, {message: msg});
-  return this.get(key);
+  if (isObject(value)) {
+    obj = lazy.merge({}, obj, value);
+  }
+  obj.name = stripQmark(obj.name || key);
+  if (!obj.message) {
+    obj.message = addQmark(obj.name);
+  }
+  obj.type = obj.type || 'input';
+  return obj;
 };
 
 /**
@@ -240,12 +317,30 @@ function setEach(obj, answers) {
   return obj;
 }
 
+function addQmark(str) {
+  if (str && str.slice(-1) !== '?') {
+    return str + '?';
+  }
+  return str;
+}
+
+function stripQmark(str) {
+  if (str && str.slice(-1) === '?') {
+    return str.slice(0, -1);
+  }
+  return str;
+}
+
+function isReserved(key) {
+  return ['name', 'input', 'message'].indexOf(key) > -1;
+}
+
 /**
  * Utility for casting a value to an array.
  */
 
 function arrayify(val) {
-  return Array.isArray(val) ? val : [val];
+  return val ? (Array.isArray(val) ? val : [val]) : [];
 }
 
 /**
@@ -253,8 +348,7 @@ function arrayify(val) {
  */
 
 function isObject(val) {
-  return val && typeof val === 'object'
-    && !Array.isArray(val);
+  return typeOf(val) === 'object';
 }
 
 /**

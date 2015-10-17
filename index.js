@@ -7,13 +7,7 @@
 
 'use strict';
 
-var typeOf = require('kind-of');
-var lazy = require('lazy-cache')(require);
-lazy('inquirer');
-lazy('mixin-deep', 'merge');
-lazy('get-value', 'get');
-lazy('has-value', 'has');
-lazy('set-value', 'set');
+var utils = require('./utils');
 
 /**
  * Create an instance of `Questions` with the
@@ -39,7 +33,7 @@ function Questions(options) {
   this.options = options || {};
   var inquirer = this.options.inquirer;
   if (typeof inquirer === 'undefined') {
-    inquirer = lazy.inquirer;
+    inquirer = utils.inquirer;
   }
 
   define(this, 'inquirer', inquirer);
@@ -82,13 +76,13 @@ Questions.prototype.set = function(key, value) {
 
   value = value || {};
   if (isObject(key)) {
-    value = lazy.merge({}, value, key);
+    value = utils.merge({}, value, key);
   }
 
   value.type = value.type || 'input';
   value.name = value.name || value.key || key;
 
-  lazy.set(this.cache, key, value);
+  utils.set(this.cache, key, value);
   this.queue.push(value);
   return this;
 };
@@ -107,7 +101,7 @@ Questions.prototype.set = function(key, value) {
  */
 
 Questions.prototype.get = function(key) {
-  return lazy.get(this.cache, key);
+  return utils.get(this.cache, key);
 };
 
 /**
@@ -125,7 +119,7 @@ Questions.prototype.get = function(key) {
  */
 
 Questions.prototype.has = function(key) {
-  return lazy.has(this.cache, key);
+  return utils.has(this.cache, key);
 };
 
 /**
@@ -195,7 +189,7 @@ Questions.prototype.normalizeObject = function(questions) {
         question = this.toQuestion(key, val, opts);
 
       } else if (typeof val === 'object') {
-        var opts = lazy.merge({}, opts, val);
+        var opts = utils.merge({}, opts, val);
         question = this.toQuestion(key, null, opts);
       }
 
@@ -230,7 +224,7 @@ Questions.prototype.toQuestion = function(key, value) {
     obj.message = value;
   }
   if (isObject(value)) {
-    obj = lazy.merge({}, obj, value);
+    obj = utils.merge({}, obj, value);
   }
   obj.name = stripQmark(obj.name || key);
   if (!obj.message) {
@@ -311,7 +305,7 @@ Questions.prototype.prompt = function() {
 function setEach(obj, answers) {
   for (var key in answers) {
     if (answers.hasOwnProperty(key)) {
-      lazy.set(obj, key, answers[key]);
+      utils.set(obj, key, answers[key]);
     }
   }
   return obj;
@@ -348,7 +342,7 @@ function arrayify(val) {
  */
 
 function isObject(val) {
-  return typeOf(val) === 'object';
+  return utils.typeOf(val) === 'object';
 }
 
 /**

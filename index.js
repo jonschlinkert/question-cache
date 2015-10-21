@@ -177,7 +177,6 @@ Questions.prototype.resolve = function(keys) {
  */
 
 Questions.prototype.normalizeObject = function(questions) {
-  var opts = this.options;
   var res = [];
 
   for (var key in questions) {
@@ -186,11 +185,10 @@ Questions.prototype.normalizeObject = function(questions) {
       var question;
 
       if (typeof val === 'string') {
-        question = this.toQuestion(key, val, opts);
+        question = this.toQuestion(key, val);
 
       } else if (typeof val === 'object') {
-        var opts = utils.merge({}, opts, val);
-        question = this.toQuestion(key, null, opts);
+        question = this.toQuestion(key, val);
       }
 
       if (question) res = res.concat(question);

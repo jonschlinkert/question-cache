@@ -1,7 +1,7 @@
 {
   "name": "question-cache",
   "description": "A wrapper around inquirer that makes it easy to create and selectively reuse questions.",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "homepage": "https://github.com/jonschlinkert/question-cache",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/question-cache",
@@ -20,7 +20,7 @@
   "dependencies": {
     "get-value": "^1.2.1",
     "has-value": "^0.2.0",
-    "inquirer": "^0.10.1",
+    "inquirer": "^0.11.0",
     "kind-of": "^2.0.1",
     "lazy-cache": "^0.2.3",
     "mixin-deep": "^1.1.3",

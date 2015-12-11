@@ -7,7 +7,7 @@
 
 'use strict';
 
-var utils = require('./utils');
+var utils = require('./lib/utils');
 
 /**
  * Create an instance of `Questions` with the

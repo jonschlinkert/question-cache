@@ -58,6 +58,12 @@
         "generate",
         "ask-once"
       ]
-    }
+    },
+    "reflinks": [
+      "verb",
+      "yeoman",
+      "generate",
+      "inquirer"
+    ]
   }
 }

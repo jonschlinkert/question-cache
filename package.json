@@ -22,7 +22,7 @@
     "has-value": "^0.3.0",
     "inquirer2": "github:jonschlinkert/inquirer2",
     "kind-of": "^3.0.2",
-    "lazy-cache": "^1.0.2",
+    "lazy-cache": "^1.0.3",
     "mixin-deep": "^1.1.3",
     "set-value": "^0.3.2"
   },
@@ -53,16 +53,20 @@
     "related": {
       "list": [
         "ask-for-github-auth",
-        "question-helper",
+        "ask-once",
         "generate",
-        "ask-once"
+        "question-helper"
       ]
     },
     "reflinks": [
-      "verb",
-      "yeoman",
       "generate",
-      "inquirer"
+      "inquirer2",
+      "verb",
+      "yeoman"
+    ],
+    "layout": "default",
+    "plugins": [
+      "gulp-format-md"
     ]
   }
 }

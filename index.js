@@ -33,7 +33,7 @@ function Questions(options) {
   this.options = options || {};
   var inquirer = this.options.inquirer;
   if (typeof inquirer === 'undefined') {
-    inquirer = utils.inquirer;
+    inquirer = utils.inquirer();
   }
 
   define(this, 'inquirer', inquirer);

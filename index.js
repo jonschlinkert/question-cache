@@ -29,13 +29,15 @@ function Questions(options) {
   if (!(this instanceof Questions)) {
     return new Questions(options);
   }
+
   Options.call(this, options);
   use(this);
+  this.options = utils.omitEmpty(options || {});
   this.initQuestions(this.options);
 }
 
 /**
- * Mixin `Emitter` methods
+ * Inherit `options-cache`
  */
 
 util.inherits(Questions, Options);
@@ -402,10 +404,10 @@ Questions.prototype.clear = function() {
 
 Questions.prototype.ask = function(queue, config, cb) {
   if (typeof queue === 'function') {
-    return this.ask(this.queue, {}, queue);
+    return this.ask.call(this, this.queue, {}, queue);
   }
   if (typeof config === 'function') {
-    return this.ask(queue, {}, config);
+    return this.ask.call(this, queue, {}, config);
   }
 
   var questions = this.buildQueue(queue);
@@ -419,7 +421,7 @@ Questions.prototype.ask = function(queue, config, cb) {
       var data = utils.merge({}, self.data, opts);
 
       var question = self.get(key);
-      var options = question.opts(opts);
+      var options = question._options = question.opts(opts);
       var val = question.answer(answers, data, self);
       debug('using answer %j', val);
 
@@ -431,7 +433,7 @@ Questions.prototype.ask = function(queue, config, cb) {
 
       // re-build options object after emitting ask, to allow
       // user to update question options from a listener
-      options = question.opts(opts, question.options);
+      options = question._options = question.opts(opts, question.options);
       debug('using options %j', options);
 
       if (options.enabled('skip')) {

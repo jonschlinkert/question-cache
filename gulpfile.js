@@ -7,7 +7,7 @@ var unused = require('gulp-unused');
 var eslint = require('gulp-eslint');
 
 gulp.task('coverage', function() {
-  return gulp.src(['index.js', 'lib/utils.js'])
+  return gulp.src(['index.js', 'lib/*.js'])
     .pipe(istanbul())
     .pipe(istanbul.hookRequire());
 });

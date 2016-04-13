@@ -11,30 +11,44 @@
   "license": "MIT",
   "files": [
     "index.js",
-    "lib/"
+    "lib"
   ],
   "main": "index.js",
   "engines": {
     "node": ">=0.10.0"
   },
   "dependencies": {
-    "get-value": "^2.0.2",
-    "has-value": "^0.3.0",
-    "inquirer2": "github:jonschlinkert/inquirer2",
-    "kind-of": "^3.0.2",
+    "arr-flatten": "^1.0.1",
+    "arr-union": "^3.1.0",
+    "async": "1.5.2",
+    "debug": "^2.2.0",
+    "define-property": "^0.2.5",
+    "get-value": "^2.0.5",
+    "has-value": "^0.3.1",
+    "inquirer2": "^0.1.1",
+    "is-answer": "^0.1.0",
+    "isobject": "^2.0.0",
     "lazy-cache": "^1.0.3",
     "mixin-deep": "^1.1.3",
-    "set-value": "^0.3.2"
+    "omit-empty": "^0.3.6",
+    "option-cache": "^3.3.5",
+    "project-name": "^0.2.4",
+    "set-value": "^0.3.3",
+    "to-choices": "^0.2.0",
+    "use": "^1.1.2"
   },
   "devDependencies": {
     "ansi-green": "^0.1.1",
     "ansi-red": "^0.1.1",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.0.0",
+    "gulp-format-md": "^0.1.7",
     "gulp-istanbul": "^0.10.2",
     "gulp-mocha": "^2.1.3",
+    "gulp-unused": "^0.1.2",
+    "helper-example": "^0.1.0",
     "mocha": "*",
-    "should": "*"
+    "resolve-dir": "^0.1.0"
   },
   "keywords": [
     "answer",
@@ -50,6 +64,15 @@
     "yeoman"
   ],
   "verb": {
+    "run": true,
+    "toc": false,
+    "layout": "default",
+    "tasks": [
+      "readme"
+    ],
+    "plugins": [
+      "gulp-format-md"
+    ],
     "related": {
       "list": [
         "ask-for-github-auth",
@@ -64,9 +87,11 @@
       "verb",
       "yeoman"
     ],
-    "layout": "default",
-    "plugins": [
-      "gulp-format-md"
+    "lint": {
+      "reflinks": true
+    },
+    "helpers": [
+      "helper-example"
     ]
   }
 }

@@ -13,7 +13,6 @@ var utils = require('./lib/utils');
  */
 
 var sessionAnswers = {};
-var forced = {};
 
 /**
  * Create an instance of `Questions` with the given `options`.
@@ -413,9 +412,10 @@ Questions.prototype.ask = function(queue, config, cb) {
   }
 
   var questions = this.buildQueue(queue);
+  var answers = this.answers;
   var self = this;
 
-  utils.async.reduce(questions, this.answers, function(answers, key, next) {
+  utils.eachSeries(questions, function(key, next) {
     debug('asking question "%s"', key);
 
     try {
@@ -487,7 +487,7 @@ Questions.prototype.ask = function(queue, config, cb) {
       self.emit('error', err);
       next(err);
     }
-  }, function(err, answers) {
+  }, function(err) {
     if (err) return cb(err);
     self.emit('answers', answers);
     cb(null, answers);

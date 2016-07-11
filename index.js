@@ -51,6 +51,7 @@ Questions.prototype.initQuestions = function(opts) {
   this.answers = sessionAnswers;
   this.inquirer = opts.inquirer || utils.inquirer();
   this.project = opts.project || utils.project(process.cwd());
+  this.Question = opts.Question || Question;
   this.data = opts.data || {};
   this.cache = {};
   this.queue = [];
@@ -124,7 +125,8 @@ Questions.prototype.addQuestion = function(name, val, options) {
     return this.visit('set', name);
   }
 
-  var question = new Question(name, val, options);
+  options = utils.merge({}, this.options, options);
+  var question = new this.Question(name, val, options);
   debug('questions#set "%s"', name);
 
   this.emit('set', question.name, question);
@@ -422,14 +424,14 @@ Questions.prototype.ask = function(queue, config, cb) {
 
       var question = self.get(key);
       var options = question._options = question.opts(opts);
-      var val = question.answer(answers, data, self);
-      debug('using answer %j', val);
+      var val = question.getAnswer(answers, data, self);
 
       // emit question before building options
       self.emit('ask', val, key, question, answers);
 
       // get val again after emitting `ask`
-      val = question.answer(answers, data, self);
+      val = question.getAnswer(answers, data, self);
+      debug('using answer %j', val);
 
       // re-build options object after emitting ask, to allow
       // user to update question options from a listener
@@ -438,18 +440,13 @@ Questions.prototype.ask = function(queue, config, cb) {
 
       if (options.enabled('skip')) {
         debug('skipping question "%s", using answer "%j"', key, val);
+        self.emit('answer', val, key, question, answers);
         question.next(val, self, answers, next);
         return;
       }
 
       var force = options.get('force');
       var isForced = force === true || utils.matchesKey(force, key);
-      if (!forced.hasOwnProperty(key)) {
-        forced[key] = true;
-      } else {
-        isForced = false;
-      }
-
       if (!isForced && utils.isAnswer(val)) {
         debug('question "%s", using answer "%j"', key, val);
         utils.set(answers, key, val);

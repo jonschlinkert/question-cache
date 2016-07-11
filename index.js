@@ -29,9 +29,8 @@ function Questions(options) {
     return new Questions(options);
   }
 
-  Options.call(this, options);
+  Options.call(this, utils.omitEmpty(options || {}));
   use(this);
-  this.options = utils.omitEmpty(options || {});
   this.initQuestions(this.options);
 }
 

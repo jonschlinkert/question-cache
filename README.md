@@ -97,7 +97,7 @@ Create an instance of `Questions` with the given `options`.
 var Questions = new Questions(options);
 ```
 
-### [.set](index.js#L90)
+### [.set](index.js#L89)
 
 Calls [addQuestion](#addQuestion), with the only difference being that `.set` returns the `questions` instance and `.addQuestion` returns the question object. So use `.set` if you want to chain questions, or `.addQuestion` if you need the created question object.
 
@@ -129,7 +129,7 @@ questions.set({
 });
 ```
 
-### [.addQuestion](index.js#L122)
+### [.addQuestion](index.js#L121)
 
 Add a question to be asked at a later point. Creates an instance of [Question](#question), so any `Question` options or settings may be used. Also, the default `type` is `input` if not defined by the user.
 
@@ -158,7 +158,7 @@ questions.addQuestion({
 });
 ```
 
-### [.choices](index.js#L159)
+### [.choices](index.js#L158)
 
 Create a "choices" question from an array of values.
 
@@ -182,7 +182,7 @@ questions.choices('foo', {
 });
 ```
 
-### [.list](index.js#L190)
+### [.list](index.js#L189)
 
 Create a "list" question from an array of values.
 
@@ -207,7 +207,7 @@ questions.list('foo', {
 });
 ```
 
-### [.rawlist](index.js#L221)
+### [.rawlist](index.js#L220)
 
 Create a "rawlist" question from an array of values.
 
@@ -232,7 +232,7 @@ questions.rawlist('foo', {
 });
 ```
 
-### [.expand](index.js#L252)
+### [.expand](index.js#L251)
 
 Create an "expand" question from an array of values.
 
@@ -257,7 +257,7 @@ questions.expand('foo', {
 });
 ```
 
-### [.confirm](index.js#L279)
+### [.confirm](index.js#L278)
 
 Create a "choices" question from an array of values.
 
@@ -278,7 +278,7 @@ questions.choices('foo', {
 });
 ```
 
-### [.get](index.js#L298)
+### [.get](index.js#L297)
 
 Get question `name`, or group `name` if question is not found. You can also do a direct lookup using `quesions.cache['foo']`.
 
@@ -294,7 +294,7 @@ var name = questions.get('name');
 //=> question object
 ```
 
-### [.has](index.js#L314)
+### [.has](index.js#L313)
 
 Returns true if `questions.cache` or `questions.groups` has question `name`.
 
@@ -307,7 +307,7 @@ var name = questions.has('name');
 //=> true
 ```
 
-### [.del](index.js#L339)
+### [.del](index.js#L338)
 
 Delete the given question or any questions that have the given namespace using dot-notation.
 
@@ -326,7 +326,7 @@ questions.get('author.name');
 //=> undefined
 ```
 
-### [.clearAnswers](index.js#L357)
+### [.clearAnswers](index.js#L356)
 
 Clear all cached answers.
 
@@ -336,7 +336,7 @@ Clear all cached answers.
 questions.clearAnswers();
 ```
 
-### [.clearQuestions](index.js#L372)
+### [.clearQuestions](index.js#L371)
 
 Clear all questions from the cache.
 
@@ -346,7 +346,7 @@ Clear all questions from the cache.
 questions.clearQuestions();
 ```
 
-### [.clear](index.js#L387)
+### [.clear](index.js#L386)
 
 Clear all cached questions and answers.
 
@@ -356,7 +356,7 @@ Clear all cached questions and answers.
 questions.clear();
 ```
 
-### [.ask](index.js#L406)
+### [.ask](index.js#L405)
 
 Ask one or more questions, with the given `options` and callback.
 
@@ -374,7 +374,7 @@ questions.ask(['name', 'description'], function(err, answers) {
 });
 ```
 
-### [.normalize](index.js#L528)
+### [.normalize](index.js#L527)
 
 Normalize the given value to return an array of question keys.
 

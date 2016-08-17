@@ -2,7 +2,7 @@
 
 var use = require('use');
 var util = require('util');
-var debug = require('debug')('questions');
+var debug = require('debug')('question-cache');
 var Options = require('option-cache');
 var Question = require('./lib/question');
 var utils = require('./lib/utils');
@@ -28,7 +28,7 @@ function Questions(options) {
   if (!(this instanceof Questions)) {
     return new Questions(options);
   }
-
+  debug('initializing from <%s>', __filename);
   Options.call(this, utils.omitEmpty(options || {}));
   use(this);
   this.initQuestions(this.options);
@@ -45,7 +45,6 @@ util.inherits(Questions, Options);
  */
 
 Questions.prototype.initQuestions = function(opts) {
-  debug('initializing question-cache');
   this.answers = sessionAnswers;
   this.inquirer = opts.inquirer || utils.inquirer();
   this.project = opts.project || utils.project(process.cwd());
@@ -123,10 +122,15 @@ Questions.prototype.addQuestion = function(name, val, options) {
     return this.visit('set', name);
   }
 
-  options = utils.merge({}, this.options, options);
+
+  options = utils.extend({}, this.options, options);
+  // if (utils.isObject(val) && !val.isQuestion && typeof name === 'string') {
+  //   options = utils.merge({}, options, val);
+  //   val = { message: options.message || name };
+  // }
+
   var question = new this.Question(name, val, options);
   debug('questions#set "%s"', name);
-
   this.emit('set', question.name, question);
   this.cache[question.name] = question;
 
@@ -416,20 +420,33 @@ Questions.prototype.ask = function(queue, config, cb) {
 
   utils.eachSeries(questions, function(key, next) {
     debug('asking question "%s"', key);
-
     try {
+
       var opts = utils.merge({}, self.options, config);
       var data = utils.merge({}, self.data, opts);
 
       var question = self.get(key);
+      var orig = utils.clone(question);
+
+      question._default = question.default;
       var options = question._options = question.opts(opts);
-      var val = question.getAnswer(answers, data, self);
+      if (options.hasOwnProperty('message')) {
+        question.message = options.message;
+      }
+      if (typeof question.default === 'undefined' && options.hasOwnProperty('default')) {
+        question.default = options.default;
+      }
+      if (typeof question.default === 'function') {
+        question.default = question.default();
+      }
+
+      var val = question.getAnswer(answers, data);
 
       // emit question before building options
       self.emit('ask', val, key, question, answers);
 
       // get val again after emitting `ask`
-      val = question.getAnswer(answers, data, self);
+      val = question.getAnswer(answers, data);
       debug('using answer %j', val);
 
       // re-build options object after emitting ask, to allow
@@ -440,7 +457,14 @@ Questions.prototype.ask = function(queue, config, cb) {
       if (options.enabled('skip')) {
         debug('skipping question "%s", using answer "%j"', key, val);
         self.emit('answer', val, key, question, answers);
-        question.next(val, self, answers, next);
+        question.skipped = true;
+
+        // question.default = question._default;
+        question.next(val, self, answers, function(err, answers) {
+          if (err) return next(err);
+          question.default = question._default;
+          next(null, answers);
+        });
         return;
       }
 
@@ -450,12 +474,18 @@ Questions.prototype.ask = function(queue, config, cb) {
         debug('question "%s", using answer "%j"', key, val);
         utils.set(answers, key, val);
         self.emit('answer', val, key, question, answers);
-        question.next(val, self, answers, next);
+        question.next(val, self, answers, function(err, answers) {
+          if (err) return next(err);
+          question.default = question._default;
+          next(null, answers);
+        });
         return;
       }
 
       self.inquirer.prompt([question], function(answer) {
         debug('answered "%s" with "%j"', key, answer);
+        // reset default to original value
+        question.default = question._default;
 
         try {
           var val = answer[key];

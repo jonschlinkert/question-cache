@@ -13,11 +13,28 @@ $ npm install --save question-cache
 ## Example
 
 ```js
+'use strict';
+
+var Store = require('data-store');
+var hints = new Store('example-hints-store');
 var questions = require('question-cache');
 
 questions()
+  .use(function() {
+    this.on('ask', function(val, key, question) {
+      question.default = hints.get(key);
+    });
+    this.on('answer', function(val, key) {
+      hints.set(key, val);
+    });
+  })
   .set('first', 'What is your first name?')
   .set('last', 'What is your last name?')
+  .set('foo', 'What is foo?', {
+    when: function() {
+      // console.log(arguments)
+    }
+  })
   .ask(function(err, answers) {
     console.log(answers);
   });
@@ -97,7 +114,7 @@ Create an instance of `Questions` with the given `options`.
 var Questions = new Questions(options);
 ```
 
-### [.set](index.js#L89)
+### [.set](index.js#L88)
 
 Calls [addQuestion](#addQuestion), with the only difference being that `.set` returns the `questions` instance and `.addQuestion` returns the question object. So use `.set` if you want to chain questions, or `.addQuestion` if you need the created question object.
 
@@ -129,7 +146,7 @@ questions.set({
 });
 ```
 
-### [.addQuestion](index.js#L121)
+### [.addQuestion](index.js#L120)
 
 Add a question to be asked at a later point. Creates an instance of [Question](#question), so any `Question` options or settings may be used. Also, the default `type` is `input` if not defined by the user.
 
@@ -158,7 +175,7 @@ questions.addQuestion({
 });
 ```
 
-### [.choices](index.js#L158)
+### [.choices](index.js#L162)
 
 Create a "choices" question from an array of values.
 
@@ -182,7 +199,7 @@ questions.choices('foo', {
 });
 ```
 
-### [.list](index.js#L189)
+### [.list](index.js#L193)
 
 Create a "list" question from an array of values.
 
@@ -207,7 +224,7 @@ questions.list('foo', {
 });
 ```
 
-### [.rawlist](index.js#L220)
+### [.rawlist](index.js#L224)
 
 Create a "rawlist" question from an array of values.
 
@@ -232,7 +249,7 @@ questions.rawlist('foo', {
 });
 ```
 
-### [.expand](index.js#L251)
+### [.expand](index.js#L255)
 
 Create an "expand" question from an array of values.
 
@@ -257,7 +274,7 @@ questions.expand('foo', {
 });
 ```
 
-### [.confirm](index.js#L278)
+### [.confirm](index.js#L282)
 
 Create a "choices" question from an array of values.
 
@@ -278,7 +295,7 @@ questions.choices('foo', {
 });
 ```
 
-### [.get](index.js#L297)
+### [.get](index.js#L301)
 
 Get question `name`, or group `name` if question is not found. You can also do a direct lookup using `quesions.cache['foo']`.
 
@@ -294,7 +311,7 @@ var name = questions.get('name');
 //=> question object
 ```
 
-### [.has](index.js#L313)
+### [.has](index.js#L317)
 
 Returns true if `questions.cache` or `questions.groups` has question `name`.
 
@@ -307,7 +324,7 @@ var name = questions.has('name');
 //=> true
 ```
 
-### [.del](index.js#L338)
+### [.del](index.js#L342)
 
 Delete the given question or any questions that have the given namespace using dot-notation.
 
@@ -326,7 +343,7 @@ questions.get('author.name');
 //=> undefined
 ```
 
-### [.clearAnswers](index.js#L356)
+### [.clearAnswers](index.js#L360)
 
 Clear all cached answers.
 
@@ -336,7 +353,7 @@ Clear all cached answers.
 questions.clearAnswers();
 ```
 
-### [.clearQuestions](index.js#L371)
+### [.clearQuestions](index.js#L375)
 
 Clear all questions from the cache.
 
@@ -346,7 +363,7 @@ Clear all questions from the cache.
 questions.clearQuestions();
 ```
 
-### [.clear](index.js#L386)
+### [.clear](index.js#L390)
 
 Clear all cached questions and answers.
 
@@ -356,7 +373,7 @@ Clear all cached questions and answers.
 questions.clear();
 ```
 
-### [.ask](index.js#L405)
+### [.ask](index.js#L409)
 
 Ask one or more questions, with the given `options` and callback.
 
@@ -374,7 +391,7 @@ questions.ask(['name', 'description'], function(err, answers) {
 });
 ```
 
-### [.normalize](index.js#L527)
+### [.normalize](index.js#L557)
 
 Normalize the given value to return an array of question keys.
 
@@ -501,7 +518,7 @@ questions.ask(['name', 'foo'], function (err, answers) {
 
 * [ask-for-github-auth](https://www.npmjs.com/package/ask-for-github-auth): Prompt a user for their github authentication credentials and save the results. | [homepage](https://github.com/doowb/ask-for-github-auth "Prompt a user for their github authentication credentials and save the results.")
 * [ask-once](https://www.npmjs.com/package/ask-once): Only ask a question one time and store the answer. | [homepage](https://github.com/doowb/ask-once "Only ask a question one time and store the answer.")
-* [generate](https://www.npmjs.com/package/generate): Generate is a command line tool and developer framework for scaffolding out new GitHub projects… [more](https://github.com/generate/generate) | [homepage](https://github.com/generate/generate "Generate is a command line tool and developer framework for scaffolding out new GitHub projects. Generators are easy to create and combine. Answers to prompts and the user's environment can be used to determine the templates, directories, files and contents to build. Support for gulp, assemble and Base plugins.")
+* [generate](https://www.npmjs.com/package/generate): Command line tool and developer framework for scaffolding out new GitHub projects. Generate offers the… [more](https://github.com/generate/generate) | [homepage](https://github.com/generate/generate "Command line tool and developer framework for scaffolding out new GitHub projects. Generate offers the robustness and configurability of Yeoman, the expressiveness and simplicity of Slush, and more powerful flow control and composability than either.")
 * [question-helper](https://www.npmjs.com/package/question-helper): Template helper that asks a question in the command line and resolves the template with… [more](https://github.com/doowb/question-helper) | [homepage](https://github.com/doowb/question-helper "Template helper that asks a question in the command line and resolves the template with the answer.")
 
 ### Contributing
@@ -512,7 +529,7 @@ Pull requests and stars are always welcome. For bugs and feature requests, [plea
 
 _(This document was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme) (a [verb](https://github.com/verbose/verb) generator), please don't edit the readme directly. Any changes to the readme must be made in [.verb.md](.verb.md).)_
 
-Generate readme and API documentation with [verb](https://github.com/verbose/verb):
+To generate the readme and API documentation with [verb](https://github.com/verbose/verb):
 
 ```sh
 $ npm install -g verb verb-generate-readme && verb
@@ -540,4 +557,4 @@ Released under the [MIT license](https://github.com/jonschlinkert/question-cache
 
 ***
 
-_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on July 11, 2016._
+_This file was generated by [verb-generate-readme](https://github.com/verbose/verb-generate-readme), v0.1.30, on August 17, 2016._

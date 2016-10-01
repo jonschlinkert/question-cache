@@ -423,7 +423,7 @@ Questions.prototype.ask = function(queue, config, cb) {
     try {
 
       var opts = utils.merge({}, self.options, config);
-      var data = utils.merge({}, self.data, opts);
+      var data = utils.merge({}, self.data, opts, opts.data);
 
       var question = self.get(key);
       var orig = utils.clone(question);

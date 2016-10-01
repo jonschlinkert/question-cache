@@ -1,7 +1,7 @@
 {
   "name": "question-cache",
   "description": "A wrapper around inquirer that makes it easy to create and selectively reuse questions.",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "homepage": "https://github.com/jonschlinkert/question-cache",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "contributors": [

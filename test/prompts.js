@@ -105,4 +105,31 @@ describe('Questions', function() {
       });
     });
   });
+
+  describe('options.required', function() {
+    it('should repeat a question until it has been answered', function(cb) {
+      var intercepted = interception('foo');
+
+      questions.set('foo', {required: true});
+      var count = 0;
+
+      questions.on('ask', function(val, key, question, answers) {
+        if (count < 5) {
+          count++;
+          bddStdin('\n');
+        } else {
+          answers[key] = 'abc';
+        }
+      });
+
+      questions.ask('foo', function(err, answers) {
+        if (err) return cb(err);
+
+        assert.equal(answers.foo, 'abc');
+        assert.equal(count, 5);
+        intercepted();
+        cb();
+      });
+    });
+  });
 });

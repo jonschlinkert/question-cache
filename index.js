@@ -414,6 +414,7 @@ Questions.prototype.ask = function(queue, config, cb) {
     return this.ask.call(this, queue, {}, config);
   }
 
+  var args = [].slice.call(arguments);
   var questions = this.buildQueue(queue);
   var answers = this.answers;
   var self = this;
@@ -489,6 +490,16 @@ Questions.prototype.ask = function(queue, config, cb) {
 
         try {
           var val = answer[key];
+          if (!val && (opts.required || question.required)) {
+            var msg = question.requiredMessage
+              || opts.requiredMessage
+              || '>> answer is required';
+
+            console.log(utils.log.red(msg));
+            self.ask.apply(self, args);
+            return;
+          }
+
           if (question.type === 'checkbox') {
             val = utils.flatten(val);
           }

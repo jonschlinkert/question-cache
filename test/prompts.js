@@ -118,14 +118,13 @@ describe('Questions', function() {
           count++;
           bddStdin('\n');
         } else {
-          answers[key] = 'abc';
+          bddStdin('bar\n');
         }
       });
 
       questions.ask('foo', function(err, answers) {
         if (err) return cb(err);
-
-        assert.equal(answers.foo, 'abc');
+        assert.equal(answers.foo, 'bar');
         assert.equal(count, 5);
         intercepted();
         cb();
